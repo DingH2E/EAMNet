@@ -227,7 +227,7 @@ def train(train_loader, model, optimizer, epoch):
     max_iter = args.epochs * len(train_loader)
     print('Warmup: {}'.format(args.warmup))
 
-    for i, (input, target, nomimg, s_input, s_mask, seeds, subcls) in enumerate(train_loader):
+    for i, (input, target, nomimg, s_input, s_mask, subcls) in enumerate(train_loader):
         data_time.update(time.time() - end)
         current_iter = epoch * len(train_loader) + i + 1
 
@@ -239,10 +239,9 @@ def train(train_loader, model, optimizer, epoch):
         s_mask = s_mask.cuda(non_blocking=True)    # [b,1,200,200]
         input = input.cuda(non_blocking=True)      # [b,3,200,200]
         target = target.cuda(non_blocking=True)    # [b,200,200]
-        # nomimg = nomimg.cuda(non_blocking=True)
+        nomimg = nomimg.cuda(non_blocking=True)
         # predicted mask[b,200,200] loss [1,b]
-        # output, main_loss = model(s_x=s_input, s_y=s_mask, nom=None, x=input, y=target)
-        output, main_loss = model(q=input, s=s_input, s_mask=s_mask, q_mask=target)
+        output, main_loss = model(s_x=s_input, s_y=s_mask, nom=None, x=input, y=target)
         """Alternative"""
         loss = main_loss
         optimizer.zero_grad()
@@ -335,7 +334,7 @@ def validate(val_loader, model, criterion):
     iter_num = 0
     total_time = 0
     for e in range(10):
-        for i, (input, target, nomimg, s_input, s_mask, seeds, subcls, ori_label) in enumerate(val_loader):
+        for i, (input, target, nomimg, s_input, s_mask, subcls, ori_label) in enumerate(val_loader):
             if (iter_num - 1) * args.batch_size_val >= test_num:
                 break
             iter_num += 1
@@ -346,7 +345,7 @@ def validate(val_loader, model, criterion):
             start_time = time.time()
             s_input = s_input.cuda(non_blocking=True)
             s_mask = s_mask.cuda(non_blocking=True)
-            # nomimg = nomimg.cuda(non_blocking=True)
+            nomimg = nomimg.cuda(non_blocking=True)
             output = model(s_x=s_input, s_y=s_mask, x=input, y=target)
             total_time = total_time + 1
             model_time.update(time.time() - start_time)
@@ -418,3 +417,4 @@ def validate(val_loader, model, criterion):
 
 if __name__ == '__main__' :
     train_gpu()
+
