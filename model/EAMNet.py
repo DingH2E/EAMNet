@@ -297,4 +297,5 @@ class OneModel(nn.Module):
         t = torch.softmax(t, dim=1)
         loss = t * torch.log(t + 1e-12) - t * torch.log(s + 1e-12)
         loss = loss.sum(1).mean()
+
         return loss
